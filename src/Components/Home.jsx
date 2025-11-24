@@ -2,16 +2,16 @@
 const Home = ({ onNavigate }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
-      <h2 className="text-3xl font-bold text-slate-800 mb-2 text-center">
+      <h2 className="text-3xl font-bold text-yellow-300 mb-2 text-center">
         به سیستم هوشمند انتخاب فن صنعتی خوش آمدید
       </h2>
-      <p className="text-lg text-slate-600 mb-12 text-center">
+      <p className="text-lg text-white mb-12 text-center">
         لطفاً بخش مورد نظر خود را برای ادامه انتخاب کنید.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
         <button
           onClick={() => onNavigate('customer')}
-          className="bg-white p-8 rounded-lg shadow-lg text-center cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-200"
+          className="bg-slate-100 p-8 rounded-lg shadow-lg text-center cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +42,7 @@ const Home = ({ onNavigate }) => {
 
         <button
           onClick={() => onNavigate('admin')}
-          className="bg-white p-8 rounded-lg shadow-lg text-center cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-200"
+          className="bg-slate-100 p-8 rounded-lg shadow-lg text-center cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

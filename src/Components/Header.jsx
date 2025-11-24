@@ -2,7 +2,7 @@ import React from 'react';
 
 const Header = ({ showHomeButton, onGoHome }) => {
   return (
-    <header className="bg-gradient-to-r from-blue-50 to-blue-100 shadow-lg sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-gray-800 to-blue-700 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
 
         {/* لوگو + عنوان */}
@@ -23,10 +23,10 @@ const Header = ({ showHomeButton, onGoHome }) => {
 
           {/* عنوان و توضیح */}
           <div className="flex flex-col">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-yellow-300">
              انتخاب فن مناسب برای پروژه شما
             </h1>
-            <p className="text-sm md:text-base text-slate-600">
+            <p className="text-sm md:text-base text-white">
              با فن آوران تهویه پیام، بهترین فن‌ها را متناسب با نیاز و فضای خود پیدا کنید. دقت، کارایی و کیفیت را یکجا تجربه کنید.
             </p>
           </div>

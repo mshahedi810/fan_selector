@@ -54,13 +54,13 @@ const App = () => {
   };
 
   return (
-    <div className="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-center w-full ">
+    <div className="bg-blue-500 min-h-screen text-slate-800 flex flex-col justify-center w-full ">
       <Header showHomeButton={view !== 'home'} onGoHome={() => setView('home')} />
       <main className="w-full p-4 md:p-8">
         {renderContent()}
       </main>
       <footer className="text-center p-4 text-slate-500 text-sm no-print">
-        <p>طراحی شده توسط مهندس ارشد فرانت‌اند با تخصص در React و Gemini API</p>
+        <p className='text-yellow-50'>طراحی شده توسط مهندس ارشد فرانت‌اند با تخصص در React و Gemini API</p>
       </footer>
     </div>
   );

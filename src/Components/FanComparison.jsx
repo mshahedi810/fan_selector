@@ -1,12 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { m3hToCfm, paToInwg } from '../utils/conversions';
-  
+
+// ردیف جدول مقایسه
 const ComparisonRow = ({ label, values, highlight }) => {
   let bestValue;
   if (highlight) {
-    const numericValues = values.map(v => typeof v === 'number' ? v : parseFloat(String(v).replace(/,/g, ''))).filter(v => !isNaN(v));
+    const numericValues = values
+      .map(v => typeof v === 'number' ? v : parseFloat(String(v).replace(/,/g, '')))
+      .filter(v => !isNaN(v));
     if (numericValues.length > 1) {
       bestValue = highlight === 'max' ? Math.max(...numericValues) : Math.min(...numericValues);
     }
@@ -27,6 +30,7 @@ const ComparisonRow = ({ label, values, highlight }) => {
   );
 };
 
+// تحلیل هوشمند Gemini
 const GeminiComparisonSummary = ({ fans }) => {
   const [summary, setSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +48,7 @@ const GeminiComparisonSummary = ({ fans }) => {
     }
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenerativeAI(process.env.API_KEY);
       const fanDataString = fans.map(f => `Model: ${f.model}, Type: ${f.type}, Airflow: ${f.maxAirflow} m3/h, Pressure: ${f.maxStaticPressure} Pa, Power: ${f.powerConsumption} kW, Noise: ${f.noiseLevel} dB, Price: ${f.price} ریال`).join('\n');
       const prompt = `As an expert HVAC engineer, compare the following industrial fans. Provide a concise, professional comparison in Persian, highlighting pros and cons.\n\nFan Data:\n${fanDataString}`;
       
@@ -76,6 +80,7 @@ const GeminiComparisonSummary = ({ fans }) => {
   );
 };
 
+// ابزار بینابینی برای نمودار
 const interpolate = (x, p1, p2) => {
   const [x1, y1] = p1;
   const [x2, y2] = p2;
@@ -83,6 +88,7 @@ const interpolate = (x, p1, p2) => {
   return Number(y1) + ((Number(x) - Number(x1)) * (Number(y2) - Number(y1))) / (Number(x2) - Number(x1));
 };
 
+// tooltip نمودار
 const CustomComparisonTooltip = ({ active, payload, label, units }) => {
   if (active && payload && payload.length) {
     return (
@@ -105,6 +111,7 @@ const CustomComparisonTooltip = ({ active, payload, label, units }) => {
   return null;
 };
 
+// کامپوننت اصلی مقایسه فن‌ها
 const FanComparison = ({ fans, onBack }) => {
   const [units, setUnits] = useState({ airflow: 'm³/h', pressure: 'Pa' });
 
