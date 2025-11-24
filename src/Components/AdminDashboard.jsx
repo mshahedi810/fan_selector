@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
-import FanForm from './FanForm';
+import FanForm from './FanForm.jsx';
 
-// XLSX از طریق script tag در index.html بارگذاری می‌شود
-// declare const XLSX: any; // در JSX نیازی نیست
+// XLSX فرض شده از script در index.html بارگذاری شده
+const XLSX = window.XLSX;
 
-const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBatch }) => {
+export default function AdminDashboard({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBatch }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingFan, setEditingFan] = useState(null);
   const fileInputRef = useRef(null);
@@ -26,7 +26,7 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
   };
 
   const handleFormSubmit = (fanData) => {
-    if (fanData.id) {
+    if ('id' in fanData) {
       onUpdateFan(fanData);
     } else {
       onAddFan(fanData);
@@ -36,15 +36,17 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
 
   const handleDownloadTemplate = () => {
     const headers = [
-      'model', 'type', 'manufacturer', 'imageUrl', 'description', 'maxAirflow', 'maxStaticPressure', 'powerConsumption',
-      'motorRpm', 'noiseLevel', 'minTemp', 'maxTemp', 'fluidType (comma-separated)', 'price',
-      'electricalSpecs_voltage', 'electricalSpecs_phase', 'electricalSpecs_frequency',
+      'model', 'type', 'manufacturer', 'imageUrl', 'description', 'maxAirflow', 'maxStaticPressure', 'powerConsumption', 
+      'motorRpm', 'noiseLevel', 'minTemp', 'maxTemp', 'fluidType (comma-separated)', 'price', 
+      'electricalSpecs_voltage', 'electricalSpecs_phase', 'electricalSpecs_frequency', 
       'dimensions_height', 'dimensions_width', 'dimensions_depth', 'performanceCurve_json'
     ];
+
     const examplePerformanceCurve = JSON.stringify([
       { "airflow": 0, "staticPressure": 480, "power": 2.5 },
       { "airflow": 25000, "staticPressure": 150, "power": 4.5 }
     ]);
+
     const exampleRow = [
       'AXC-560M', 'فن محوری (Axial)', 'Systemair', 'https://picsum.photos/seed/fan1/400/300', 'توضیحات محصول', 25000, 450, 4.5, 1450, 75, -20, 60, 'هوای تمیز,دود', 180000000, 380, 3, 50, 700, 700, 400, examplePerformanceCurve
     ];
@@ -66,7 +68,7 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = new Uint8Array(e.target.result);
+        const data = new Uint8Array(e.target?.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
@@ -108,14 +110,11 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
 
         onAddFansBatch(newFans);
         alert(`${newFans.length} محصول با موفقیت وارد شد.`);
-
       } catch (error) {
         console.error("Error parsing Excel file:", error);
         alert(`خطا در پردازش فایل اکسل: ${error.message}`);
       } finally {
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+        if(fileInputRef.current) fileInputRef.current.value = '';
       }
     };
     reader.readAsArrayBuffer(file);
@@ -126,18 +125,36 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
       <div className="flex flex-wrap justify-between items-center gap-4 mb-4 border-b pb-4">
         <h2 className="text-xl font-bold">مدیریت محصولات</h2>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={handleDownloadTemplate} className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors font-semibold flex items-center gap-2 text-sm">
-            <span>دانلود نمونه</span>
+          <button
+            onClick={handleDownloadTemplate}
+            className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors font-semibold flex items-center gap-2 text-sm"
+          >
+            دانلود نمونه
           </button>
-          <button onClick={handleFileImportClick} className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 text-sm">
-            <span>ورود از اکسل</span>
+
+          <button
+            onClick={handleFileImportClick}
+            className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 text-sm"
+          >
+            ورود از اکسل
           </button>
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".xlsx, .xls" />
-          <button onClick={handleAddNew} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2 text-sm">
+
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange}
+            className="hidden"
+            accept=".xlsx, .xls"
+          />
+
+          <button
+            onClick={handleAddNew}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2 text-sm"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
-            <span>افزودن فن جدید</span>
+            افزودن فن جدید
           </button>
         </div>
       </div>
@@ -150,11 +167,14 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">سازنده</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">نوع</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">حداکثر دبی</th>
-              <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
+              <th className="px-6 py-3 relative">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
-            {fans.map(fan => (
+            {fans.map((fan) => (
               <tr key={fan.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{fan.model}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{fan.manufacturer}</td>
@@ -179,6 +199,4 @@ const AdminDashboard = ({ fans, onAddFan, onUpdateFan, onDeleteFan, onAddFansBat
       )}
     </div>
   );
-};
-
-export default AdminDashboard;
+}
