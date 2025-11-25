@@ -1,5 +1,18 @@
 
 const Home = ({ onNavigate }) => {
+  const isAdminLoggedIn = () => {
+    const loggedIn = localStorage.getItem("adminLoggedIn") === "true";
+    const expire = parseInt(localStorage.getItem("adminExpire"), 10);
+
+    if (!loggedIn || !expire) return false;
+    if (Date.now() > expire) {
+      // زمان منقضی شده → لاگین پاک شود
+      localStorage.removeItem("adminLoggedIn");
+      localStorage.removeItem("adminExpire");
+      return false;
+    }
+    return true;
+  };
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
       <h2 className="text-3xl font-bold text-yellow-300 mb-2 text-center">
@@ -41,8 +54,13 @@ const Home = ({ onNavigate }) => {
         </button>
 
         <button
-          onClick={() => onNavigate('admin')}
-          className="bg-slate-100 p-8 rounded-lg shadow-lg text-center cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-slate-200"
+          onClick={() => {
+            if (isAdminLoggedIn()) {
+              onNavigate("admin"); 
+            } else {
+              onNavigate("login"); 
+            }
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
