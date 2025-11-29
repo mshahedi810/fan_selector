@@ -1,6 +1,134 @@
+<<<<<<< HEAD
 import GeminiSummary from './GeminiSummary';
 import FanCard from './FanCard';
 
+=======
+import React, { useState } from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// ======================= Fan Card =======================
+
+const FanCard = ({ fan, onSelect, onToggleCompare, isSelectedForCompare }) => (
+  <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl border flex flex-col">
+    <img src={fan.imageUrl} alt={fan.model} className="w-full h-48 object-cover" />
+
+    <div className="p-4 flex flex-col flex-grow">
+      <h3 className="text-lg font-bold text-slate-800">{fan.model}</h3>
+      <p className="text-sm text-slate-500 mb-2">
+        {fan.manufacturer} - {fan.type}
+      </p>
+
+      <p className="text-xs text-slate-600 mb-4 flex-grow">
+        {fan.description.substring(0, 100)}...
+      </p>
+
+      <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+        <div className="bg-slate-100 p-2 rounded-md">
+          <div className="font-semibold text-slate-700">دبی هوا</div>
+          <div className="text-slate-500">{fan.maxAirflow.toLocaleString('fa-IR')} m³/h</div>
+        </div>
+
+        <div className="bg-slate-100 p-2 rounded-md">
+          <div className="font-semibold text-slate-700">فشار استاتیک</div>
+          <div className="text-slate-500">{fan.maxStaticPressure.toLocaleString('fa-IR')} Pa</div>
+        </div>
+      </div>
+    </div>
+
+    <div className="px-4 pb-4 flex flex-col sm:flex-row gap-2">
+      <button
+        onClick={onSelect}
+        className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-semibold"
+      >
+        مشاهده جزئیات
+      </button>
+
+      <button
+        onClick={onToggleCompare}
+        className={`flex-1 py-2 px-4 rounded-md transition-colors text-sm font-semibold border ${
+          isSelectedForCompare
+            ? 'bg-red-100 text-red-700 border-red-300 hover:bg-red-200'
+            : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
+        }`}
+      >
+        {isSelectedForCompare ? 'حذف از مقایسه' : 'افزودن به مقایسه'}
+      </button>
+    </div>
+  </div>
+);
+
+
+// ======================= Gemini Summary =======================
+
+const GeminiSummary = ({ fans }) => {
+  const [summary, setSummary] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const getSummary = async () => {
+    if (!fans || fans.length === 0) return;
+
+    setIsLoading(true);
+    setError('');
+    setSummary('');
+
+    try {
+      if (!process.env.REACT_APP_GOOGLE_API_KEY) {
+        setError("API Key تنظیم نشده است.");
+        setIsLoading(false);
+        return;
+      }
+
+      const ai = new GoogleGenerativeAI(process.env.REACT_APP_GOOGLE_API_KEY);
+      const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const fanDataString = fans.map(f =>
+        `Model: ${f.model}, Type: ${f.type}, Airflow: ${f.maxAirflow} m3/h, Pressure: ${f.maxStaticPressure} Pa, Power: ${f.powerConsumption} kW, Noise: ${f.noiseLevel} dB`
+      ).join('\n');
+
+      const prompt = `As an expert HVAC engineer, provide a brief Persian summary for the following industrial fans. Highlight key strengths and ideal applications for each model.
+
+Fan Data:
+${fanDataString}`;
+
+      const result = await model.generateContent({
+        contents: prompt
+      });
+
+      // بررسی انواع ساختار پاسخ
+      const text = result.output_text || result.contents?.[0]?.text || "خطا: پاسخی دریافت نشد";
+      setSummary(text);
+
+    } catch (e) {
+      console.error(e);
+      setError("خطا در تولید خلاصه رخ داد.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-blue-800">خلاصه هوشمند</h3>
+        <button
+          onClick={getSummary}
+          disabled={isLoading || fans.length === 0}
+          className="bg-blue-600 text-white text-xs py-1 px-3 rounded-md hover:bg-blue-700 disabled:bg-slate-400"
+        >
+          {isLoading ? 'در حال پردازش...' : 'تولید خلاصه'}
+        </button>
+      </div>
+
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+      {summary && (
+        <div className="mt-4 text-sm text-slate-700 whitespace-pre-wrap">{summary}</div>
+      )}
+    </div>
+  );
+};
+>>>>>>> f0f6deb2997b72238193b2a3b6b3878acb917d0b
 
 // ======================= Main Component =======================
 
@@ -31,6 +159,7 @@ const FanResults = ({ fans, onSelectFan, onToggleCompare, compareList, onShowCom
       {fans.length > 0 && <GeminiSummary fans={fans} />}
 
       {/* لیست کارت‌ها */}
+<<<<<<< HEAD
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
         {fans.map((fan) => (
           <div
@@ -48,6 +177,20 @@ const FanResults = ({ fans, onSelectFan, onToggleCompare, compareList, onShowCom
       </div>
 
 
+=======
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {fans.map((fan) => (
+          <FanCard
+            key={fan.id}
+            fan={fan}
+            onSelect={() => onSelectFan(fan)}
+            onToggleCompare={() => onToggleCompare(fan)}
+            isSelectedForCompare={compareList.some((f) => f.id === fan.id)}
+          />
+        ))}
+      </div>
+
+>>>>>>> f0f6deb2997b72238193b2a3b6b3878acb917d0b
       {/* بدون نتیجه */}
       {fans.length === 0 && (
         <div className="text-center py-16 bg-white rounded-lg shadow-md">

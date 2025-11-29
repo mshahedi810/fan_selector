@@ -120,6 +120,7 @@ const AIVoiceFilter = ({ onFiltersUpdate }) => {
   };
 
   return (
+<<<<<<< HEAD
    <div className="flex flex-col justify-center bg-gradient-to-br from-blue-200 to-blue-50 p-6 rounded-2xl shadow-lg no-print transition-all duration-300 hover:shadow-2xl">
   
   {/* تیتر */}
@@ -172,6 +173,38 @@ const AIVoiceFilter = ({ onFiltersUpdate }) => {
 </div>
 
 
+=======
+    <div className="bg-white p-6 rounded-lg shadow-md no-print">
+      <h2 className="text-lg font-bold mb-4 border-b pb-2">فیلتر هوشمند صوتی</h2>
+
+      <div className="flex flex-col items-center gap-4">
+
+        <button
+          onClick={handleListen}
+          className={`w-20 h-20 rounded-full text-white flex items-center justify-center transition-colors ${
+            isListening ? "bg-red-500" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {isListening ? "🎤" : "🎧"}
+        </button>
+
+        <p className="text-xs text-slate-500">
+          {isListening ? "در حال شنیدن..." : "برای شروع کلیک کنید"}
+        </p>
+
+        {(transcript || isLoading || analysis || error) && (
+          <div className="w-full mt-2 p-3 bg-slate-50 rounded-md text-sm border min-h-[60px]">
+            {isLoading && <p className="text-blue-600 animate-pulse">در حال تحلیل...</p>}
+            {error && <p className="text-red-600">{error}</p>}
+            {analysis && <p className="text-green-700 font-semibold">{analysis}</p>}
+            {!isLoading && !analysis && transcript && (
+              <p className="text-slate-500">شما گفتید: "{transcript}"</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+>>>>>>> f0f6deb2997b72238193b2a3b6b3878acb917d0b
   );
 };
 
