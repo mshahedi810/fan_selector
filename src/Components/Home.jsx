@@ -1,0 +1,105 @@
+
+const Home = ({ onNavigate }) => {
+  const isAdminLoggedIn = () => {
+    const loggedIn = localStorage.getItem("adminLoggedIn") === "true";
+    const expire = parseInt(localStorage.getItem("adminExpire"), 10);
+
+    if (!loggedIn || !expire) return false;
+    if (Date.now() > expire) {
+      // زمان منقضی شده → لاگین پاک شود
+      localStorage.removeItem("adminLoggedIn");
+      localStorage.removeItem("adminExpire");
+      return false;
+    }
+    return true;
+  };
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[82vh] px-4">
+  <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 text-center drop-shadow-lg">
+    به سیستم هوشمند انتخاب فن صنعتی خوش آمدید
+  </h2>
+  <p className="text-lg text-white/90 mb-12 text-center max-w-2xl">
+    لطفاً بخش مورد نظر خود را برای ادامه انتخاب کنید.
+  </p>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
+
+    {/* کارت مشتریان */}
+    <button
+      onClick={() => onNavigate('customer')}
+      className="bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-2xl shadow-2xl p-8 text-center transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.02] border border-blue-400"
+    >
+      <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/10 backdrop-blur-lg flex items-center justify-center shadow-inner">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-14 w-14 text-white drop-shadow-lg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">
+        بخش مشتریان و انتخاب محصول
+      </h3>
+      <p className="text-white/80">
+        جستجو، فیلتر و شبیه‌سازی عملکرد فن‌ها بر اساس نیازهای پروژه شما.
+      </p>
+    </button>
+
+    {/* کارت پرسنل */}
+    <button
+      onClick={() => {
+        if (isAdminLoggedIn()) onNavigate("admin");
+        else onNavigate("login");
+      }}
+      className="bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-2xl shadow-2xl p-8 text-center transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.02] border border-green-400"
+    >
+      <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/10 backdrop-blur-lg flex items-center justify-center shadow-inner">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-14 w-14 text-white drop-shadow-lg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">
+        بخش پرسنل و مشاوران
+      </h3>
+      <p className="text-white/80">
+        مدیریت پایگاه داده محصولات، افزودن فن جدید و ویرایش پارامترهای فنی.
+      </p>
+    </button>
+
+  </div>
+</div>
+
+
+  );
+};
+
+export default Home;
