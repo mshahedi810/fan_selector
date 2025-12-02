@@ -1,0 +1,74 @@
+import GeminiSummary from './GeminiSummary';
+import FanCard from './FanCard';
+
+
+// ======================= Main Component =======================
+
+const FanResults = ({ fans, onSelectFan, onToggleCompare, compareList, onShowComparison }) => {
+  return (
+    <div>
+      {/* بخش باکس مقایسه */}
+      {compareList.length > 0 && (
+        <div className="bg-white p-4 rounded-lg shadow-md mb-6 sticky top-8 z-10 flex justify-between items-center">
+          <div className="flex-grow">
+            <span className="font-bold">{compareList.length}</span> محصول برای مقایسه انتخاب شده:
+            <span className="text-sm text-slate-600 mr-2">
+              {compareList.map((f) => f.model).join('، ')}
+            </span>
+          </div>
+
+          <button
+            onClick={onShowComparison}
+            disabled={compareList.length < 2}
+            className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+          >
+            مقایسه کن ({compareList.length}/4)
+          </button>
+        </div>
+      )}
+
+      {/* خلاصه هوشمند */}
+      {fans.length > 0 && <GeminiSummary fans={fans} />}
+
+      {/* لیست کارت‌ها */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        {fans.map((fan) => (
+          <div
+            key={fan.id}
+            className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-200 overflow-hidden"
+          >
+            <FanCard
+              fan={fan}
+              onSelect={() => onSelectFan(fan)}
+              onToggleCompare={() => onToggleCompare(fan)}
+              isSelectedForCompare={compareList.some((f) => f.id === fan.id)}
+            />
+          </div>
+        ))}
+      </div>
+
+
+      {/* بدون نتیجه */}
+      {fans.length === 0 && (
+        <div className="text-center py-16 bg-white rounded-lg shadow-md">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="mx-auto h-12 w-12 text-slate-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+
+          <h3 className="mt-2 text-sm font-medium text-slate-900">نتیجه‌ای یافت نشد</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            لطفاً پارامترهای فنی پروژه را تغییر دهید و مجدداً تلاش کنید.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FanResults;
