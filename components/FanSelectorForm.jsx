@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { m3hToCfm, cfmToM3h, paToInwg, inwgToPa } from "../utils/conversions";
 import UnitSelector from "./UnitSelector";
 import StepperInput from "./StepperInput";
@@ -73,7 +73,7 @@ const FanSelectorForm = ({ filters, onFilterChange }) => {
           <span>دمای کاری</span>
           <span>°C</span>
         </label>
-        <div className="text-center font-semibold text-white mb-2 text-lg">{filters.temperature.toLocaleString("fa-IR")}°C</div>
+        <div className="text-center font-semibold text-white mb-2 text-lg">{filters.temperature != null ? filters.temperature.toLocaleString("fa-IR") : "--"}°C</div>
         <StepperInput value={filters.temperature} min={-30} max={100} step={1} onChange={val => onFilterChange({ ...filters, temperature: val })} />
       </div>
 

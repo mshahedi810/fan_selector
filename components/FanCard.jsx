@@ -5,20 +5,21 @@ import { FaWind, FaTachometerAlt, FaInfoCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const FanCard = ({ fan, onSelect, onToggleCompare, isSelectedForCompare }) => {
+  console.log(fan.imageUrl)
   return (
     <motion.div
-      className={`fan-card flex flex-col h-full relative bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${
-        isSelectedForCompare ? "ring-2 ring-red-400" : "border-gray-700"
-      }`}
+      className={`fan-card flex flex-col h-full relative bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${isSelectedForCompare ? "ring-2 ring-red-400" : "border-gray-700"
+        }`}
       whileHover={{ scale: 1.03 }}
     >
       {/* تصویر */}
       <div className="relative group">
         <img
-          src={fan.imageUrl}
+          src={fan.imageUrl ? fan.imageUrl : `https://picsum.photos/seed/fan${fan._id}/400/300`}
           alt={fan.model}
           className="w-full h-44 md:h-48 object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-3xl"
         />
+        
         {isSelectedForCompare && (
           <div className="absolute top-3 right-3 bg-red-100/20 text-red-400 px-3 py-1 text-xs rounded-md font-semibold shadow backdrop-blur-sm">
             در مقایسه
@@ -47,7 +48,7 @@ const FanCard = ({ fan, onSelect, onToggleCompare, isSelectedForCompare }) => {
             <FaWind className="text-pink-400" />
             <div>
               <div className="text-xs font-semibold text-pink-400">دبی هوا</div>
-              <div className="text-sm text-white/80">{fan.maxAirflow.toLocaleString('fa-IR')} m³/h</div>
+              <div className="text-sm text-white/80">{(fan.maxAirflow || 0).toLocaleString('fa-IR')} m³/h</div>
             </div>
           </div>
 
@@ -55,7 +56,7 @@ const FanCard = ({ fan, onSelect, onToggleCompare, isSelectedForCompare }) => {
             <FaTachometerAlt className="text-green-400" />
             <div>
               <div className="text-xs font-semibold text-green-400">فشار استاتیک</div>
-              <div className="text-sm text-white/80">{fan.maxStaticPressure.toLocaleString('fa-IR')} Pa</div>
+              <div className="text-sm text-white/80">{(fan.maxStaticPressure || 0).toLocaleString('fa-IR')} Pa</div>
             </div>
           </div>
         </div>
@@ -70,11 +71,10 @@ const FanCard = ({ fan, onSelect, onToggleCompare, isSelectedForCompare }) => {
 
           <button
             onClick={onToggleCompare}
-            className={`w-full sm:flex-1 py-2 px-3 rounded-2xl font-bold text-center border-2 transition-transform hover:scale-105 ${
-              isSelectedForCompare
+            className={`w-full sm:flex-1 py-2 px-3 rounded-2xl font-bold text-center border-2 transition-transform hover:scale-105 ${isSelectedForCompare
                 ? "bg-red-100/20 text-red-400 border-red-400 hover:bg-red-200/30"
                 : "bg-gray-700/50 text-white/80 border-gray-600 hover:bg-gray-700/70 hover:text-pink-400 hover:border-pink-400"
-            }`}
+              }`}
           >
             {isSelectedForCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}
           </button>

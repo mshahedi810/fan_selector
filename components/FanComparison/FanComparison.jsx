@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { m3hToCfm, paToInwg } from "@/utils/conversions";
 import ComparisonRow from "./ComparisonRow";
-import GeminiComparisonSummary from "./GeminiComparisonSummary";
+import GeminiComparisonSummary from "./N8NComparisonSummary";
 import CustomComparisonTooltip from "./CustomComparisonTooltip";
 
 const interpolate = (x, p1, p2) => {
@@ -36,7 +36,7 @@ const FanComparison = ({ fans, onBack }) => {
             pressure = interpolate(airflow, p1, p2);
           }
         }
-        dataPoint[`pressure_${fan.id}`] = pressure;
+        dataPoint[`pressure_${fan._id}`] = pressure;
       });
       return dataPoint;
     });
@@ -54,17 +54,20 @@ const FanComparison = ({ fans, onBack }) => {
 
     const getSpecValue = (fan, key) => {
       switch (key) {
+        case "type": return fan.fanSeries?.type ?? "-";
+        case "manufacturer": return fan.fanSeries?.manufacturer ?? "-";
         case "maxAirflow": return units.airflow === "CFM" ? m3hToCfm(fan.maxAirflow) : fan.maxAirflow;
-        case "maxStaticPressure": return units.pressure === "inWG" ? paToInwg(fan.maxStaticPressure) : fan.maxStaticPressure;
-        case "tempRange": return `${fan.minTemp} الی ${fan.maxTemp}`;
-        case "dimensions": return `${fan.dimensions.height}x${fan.dimensions.width}x${fan.dimensions.depth}`;
-        case "electrical": return `${fan.electricalSpecs.voltage}V / ${fan.electricalSpecs.phase}Ph / ${fan.electricalSpecs.frequency}Hz`;
-        case "type": return fan.type;
-        case "manufacturer": return fan.manufacturer;
-        case "powerConsumption": return fan.powerConsumption;
-        case "motorRpm": return fan.motorRpm;
-        case "noiseLevel": return fan.noiseLevel;
-        case "price": return fan.price;
+        case "maxStaticPressure": {
+          const maxPressure = Math.max(...fan.performanceCurve.map(p => p.staticPressure));
+          return units.pressure === "inWG" ? paToInwg(maxPressure) : maxPressure;
+        }
+        case "tempRange": return `${fan.minTemp ?? 0} الی ${fan.maxTemp ?? 50}`;
+        case "dimensions": return `${fan.dimensions.H ?? 0}x${fan.dimensions.A ?? 0}x${fan.dimensions.B ?? 0}`;
+        case "electrical": return `${fan.electricalSpecs.voltage ?? '-'}V / ${fan.electricalSpecs.phase ?? '-'}Ph / ${fan.electricalSpecs.frequency ?? '-'}Hz`;
+        case "powerConsumption": return fan.powerConsumption ?? "-";
+        case "motorRpm": return fan.motorRpm ?? "-";
+        case "noiseLevel": return fan.noiseLevel ?? "-";
+        case "price": return fan.price ?? "-";
         default: return "";
       }
     };
@@ -96,7 +99,7 @@ const FanComparison = ({ fans, onBack }) => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-950 to-black p-6 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)] text-white">
+    <div className="bg-linear-to-br from-gray-900 via-gray-950 to-black p-6 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)] text-white">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/20 pb-4 mb-6">
         <div>
@@ -148,9 +151,9 @@ const FanComparison = ({ fans, onBack }) => {
             <tr className="border-b-2 border-white/20">
               <th className="p-3 text-sm font-semibold text-white/80 text-right sticky left-0 z-10 bg-black/30">مشخصات</th>
               {fans.map(fan => (
-                <th key={fan.id} className="p-3 text-sm font-semibold text-center text-white/90">
-                  <img src={fan.imageUrl} alt={fan.model} className="w-32 h-24 object-cover mx-auto rounded-md mb-2 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                  {fan.model}
+                <th key={fan._id} className="p-3 text-sm font-semibold text-center text-white/90">
+                  <img src={fan.imageUrl || '/images/default-fan.jpg'} alt={fan.variantName} className="w-32 h-24 object-cover mx-auto rounded-md mb-2 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                  {fan.variantName}
                 </th>
               ))}
             </tr>
@@ -180,7 +183,7 @@ const FanComparison = ({ fans, onBack }) => {
               <Tooltip content={<CustomComparisonTooltip units={units} />} />
               <Legend wrapperStyle={{ color: 'white' }} />
               {fans.map((fan, index) => (
-                <Line key={fan.id} type="monotone" dataKey={`pressure_${fan.id}`} name={fan.model} stroke={colors[index % colors.length]} strokeWidth={2} dot={false} />
+                <Line key={fan._id} type="monotone" dataKey={`pressure_${fan._id}`} name={fan.variantName} stroke={colors[index % colors.length]} strokeWidth={2} dot={false} />
               ))}
             </LineChart>
           </ResponsiveContainer>

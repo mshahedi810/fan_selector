@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminDashboard from "@/components/AdminDashboard";
-import { FANS_DATA } from "@/data/fans";
 
 export default function Page() {
   const router = useRouter();
   const [allowed, setAllowed] = useState(false);
+  const [fans, setFans] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // بررسی لاگین
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("adminLoggedIn");
     const expire = parseInt(localStorage.getItem("adminExpire"), 10);
@@ -20,15 +22,47 @@ export default function Page() {
     }
   }, [router]);
 
-  if (!allowed) return null;
+  // گرفتن دیتا از API
+  useEffect(() => {
+    if (!allowed) return;
+
+    const fetchFans = async () => {
+      try {
+        const res = await fetch("api/fans/variants");
+        if (!res.ok) throw new Error("Failed to fetch fans");
+        const data = await res.json();
+        setFans(data);
+      } catch (err) {
+        console.error("Failed to fetch fans", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFans();
+  }, [allowed]);
+
+  if (!allowed || loading) return null;
 
   return (
     <AdminDashboard 
-      fans={FANS_DATA || []} 
-      onAddFan={(fan) => console.log("Add:", fan)}
-      onUpdateFan={(fan) => console.log("Update:", fan)}
-      onDeleteFan={(id) => console.log("Delete:", id)}
-      onAddFansBatch={(newFans) => console.log("Batch Add:", newFans)}
+      fans={fans} 
+      onAddFan={(fan) => {
+        setFans(prev => [...prev, fan]);
+        console.log("Add:", fan);
+      }}
+      onUpdateFan={(updatedFan) => {
+        setFans(prev => prev.map(f => f._id === updatedFan._id ? updatedFan : f));
+        console.log("Update:", updatedFan);
+      }}
+      onDeleteFan={(id) => {
+        setFans(prev => prev.filter(f => f._id !== id));
+        console.log("Delete:", id);
+      }}
+      onAddFansBatch={(newFans) => {
+        setFans(prev => [...prev, ...newFans]);
+        console.log("Batch Add:", newFans);
+      }}
     />
   );
 }

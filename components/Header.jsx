@@ -21,7 +21,7 @@ export default function Header({ onNavigate }) {
         <motion.div whileHover={{ scale: 1.03 }} className="flex items-center gap-3 select-none p-2 md:p-3">
           <div className="bg-gray-900/80 rounded-full p-1 flex items-center justify-center border border-gray-700">
             <img
-              src="./images/ftpe.png"
+              src="/images/ftpe.png"
               alt="Logo"
               className="w-12 h-12 md:w-16 md:h-16 bg-slate-200 rounded-full object-contain filter brightness-150"
             />

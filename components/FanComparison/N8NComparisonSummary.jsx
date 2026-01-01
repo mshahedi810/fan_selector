@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GeminiComparisonSummary = ({ fans }) => {
+const N8NComparisonSummary = ({ fans, webhookUrl }) => {
   const [summary, setSummary] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -12,26 +11,40 @@ const GeminiComparisonSummary = ({ fans }) => {
     setError("");
     setSummary("");
 
-    if (!process.env.NEXT_PUBLIC_GOOGLE_API_KEY) {
-      setError("API key is not configured.");
+    if (!webhookUrl) {
+      setError("Webhook n8n مشخص نشده است.");
       setIsLoading(false);
       return;
     }
 
     try {
-      const ai = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
-      const fanDataString = fans.map(f => `Model: ${f.model}, Type: ${f.type}, Airflow: ${f.maxAirflow} m3/h, Pressure: ${f.maxStaticPressure} Pa, Power: ${f.powerConsumption} kW, Noise: ${f.noiseLevel} dB, Price: ${f.price} ریال`).join("\n");
-      const prompt = `As an expert HVAC engineer, compare the following industrial fans. Provide a concise, professional comparison in Persian, highlighting pros and cons.\n\nFan Data:\n${fanDataString}`;
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
+      // داده‌ها را آماده می‌کنیم
+      const fanData = fans.map(f => ({
+        model: f.model,
+        type: f.type,
+        airflow: f.maxAirflow,
+        pressure: f.maxStaticPressure,
+        power: f.powerConsumption,
+        noise: f.noiseLevel,
+        price: f.price,
+      }));
+
+      // POST به Webhook n8n
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fans: fanData }),
       });
 
-      setSummary(response.text);
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "خطا در پردازش Webhook");
+
+      // فرض می‌کنیم n8n پاسخ را به شکل { summary: "..." } برمی‌گرداند
+      setSummary(data.summary || "پاسخ خالی بود.");
     } catch (e) {
       console.error(e);
-      setError("خطا در تولید تحلیل.");
+      setError("خطا در اتصال به n8n.");
     } finally {
       setIsLoading(false);
     }
@@ -50,9 +63,9 @@ const GeminiComparisonSummary = ({ fans }) => {
         </button>
       </div>
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      {summary && <div className="mt-4 text-sm text-white/80 whitespace-pre-wrap prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: summary.replace(/\n/g, "<br />") }}></div>}
+      {summary && <div className="mt-4 text-sm text-white/80 whitespace-pre-wrap prose prose-sm max-w-none">{summary}</div>}
     </div>
   );
 };
 
-export default GeminiComparisonSummary;
+export default N8NComparisonSummary;
