@@ -7,6 +7,7 @@ import FanComparison from './FanComparison/FanComparison';
 import AIVoiceFilter from './AIVoiceFilter';
 import FanSelectorForm from './FanSelectorForm';
 import FanResults from './FanResults';
+import AITextInput from './AITextInput';
 
 const CustomerPortal = () => {
   const [fans, setFans] = useState([]);
@@ -78,18 +79,18 @@ const CustomerPortal = () => {
   };
 
   const handleToggleCompare = (fan) => {
-  setCompareList(prev => {
-    const exists = prev.find(f => f._id === fan._id);
-    if (exists) {
-      return prev.filter(f => f._id !== fan._id);
-    }
-    // اضافه کردن جدید فقط اگر کمتر از 4 تا هست
-    if (prev.length < 4) {
-      return [...prev, fan];
-    }
-    return prev;
-  });
-};
+    setCompareList(prev => {
+      const exists = prev.find(f => f._id === fan._id);
+      if (exists) {
+        return prev.filter(f => f._id !== fan._id);
+      }
+      // اضافه کردن جدید فقط اگر کمتر از 4 تا هست
+      if (prev.length < 4) {
+        return [...prev, fan];
+      }
+      return prev;
+    });
+  };
 
 
   const handleShowComparison = () => {
@@ -119,8 +120,14 @@ const CustomerPortal = () => {
             onAiResponse={setAiResponse}
             webhookUrl="https://n8n.ftp-co.com/webhook/fan-session"
           />
+
+          <AITextInput
+            webhookUrl="https://n8n.ftp-co.com/webhook/fan-session"
+            onAiResponse={setAiResponse}
+          />
+
           <FanSelectorForm filters={filters} onFilterChange={setFilters} />
-          
+
           {aiResponse && (
             <div className="p-4 bg-green-50 rounded-xl shadow-md text-sm text-gray-800 space-y-2">
               <h4 className="font-semibold mb-2">پیشنهاد AI Agent:</h4>
